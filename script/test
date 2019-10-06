@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+clear
+./vendor/bin/phpunit tests/

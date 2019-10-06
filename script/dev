@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+fswatch -o ./src/ ./tests/ | xargs  -n1 -I{} ./script/test
