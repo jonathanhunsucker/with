@@ -22,7 +22,7 @@ with(new Open("file.txt", "w"))->do(function ($handle) {
 
 ## Pros
 - Less boilerplate code
-- Keep individual concerns' logic altogether
+- Colocates a concerns enter and exit logic
 
 ## Cons
 - Another layer of indirection
