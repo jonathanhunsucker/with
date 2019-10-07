@@ -39,7 +39,22 @@ class BasicUseCase extends TestCase
 
     public function testResilienceToExceptions(): void
     {
-        $notes_its_own_exit = new class implements Context {
+        $notes_its_own_exit = $this->instrumentedContext();
+
+        try {
+            with($notes_its_own_exit)->do(function ($_) {
+                throw new \Exception("Thrown inside the body");
+            });
+        } catch (\Exception $e) {
+            // swallow it
+        }
+
+        $this->assertTrue($notes_its_own_exit->exit_did_run);
+    }
+
+    private function instrumentedContext()
+    {
+        return new class implements Context {
             public $exit_did_run = false;
 
             public function enter()
@@ -52,15 +67,5 @@ class BasicUseCase extends TestCase
                 $this->exit_did_run = true;
             }
         };
-
-        try {
-            with($notes_its_own_exit)->do(function ($_) {
-                throw new \Exception("Thrown inside the body");
-            });
-        } catch (\Exception $e) {
-            // swallow it
-        }
-
-        $this->assertTrue($notes_its_own_exit->exit_did_run);
     }
 }
