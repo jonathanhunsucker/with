@@ -17,26 +17,28 @@ class BoundContexts
         $entered = [];
 
         try {
-            foreach ($this->contexts as $context) {
-                $arguments[] = $context->enter();
-                $entered[] = $context;
-            }
-        } catch (\Exception $e) {
-            $this->exitAll($entered);
-            throw new \RuntimeException("Failed to enter context", 0, $e);
-        }
+            try {
+                // first, enter each context, one-by-one
+                foreach ($this->contexts as $context) {
+                    // recording their results for later invocation
+                    $arguments[] = $context->enter();
 
-        try {
+                    // as well as marking that they were enterd
+                    $entered[] = $context;
+                }
+            } catch (\Exception $e) {
+                // if a context throws an exception during enter()
+                // translate it to a runtime exception, pointing at the original cause
+                throw new \RuntimeException("Failed to enter context", 0, $e);
+            }
+
+            // with the contexts entered and results ready, invoke the action
             call_user_func_array($function, $arguments);
         } finally {
-            $this->exitAll($entered);
-        }
-    }
-
-    private function exitAll($contexts)
-    {
-        foreach ($contexts as $context) {
-            $context->exit();
+            // exit an entered contexts
+            foreach ($entered as $context) {
+                $context->exit();
+            }
         }
     }
 }
