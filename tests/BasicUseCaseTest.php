@@ -52,6 +52,34 @@ class BasicUseCase extends TestCase
         $this->assertTrue($notes_its_own_exit->exit_did_run);
     }
 
+    public function testPartialFailureResultsInRuntimeException(): void
+    {
+        $successful = $this->instrumentedContext();
+        $fails_during_enter = $this->failsOnEnterContext();
+
+        $this->expectException(\RuntimeException::class);
+
+        with($successful, $fails_during_enter)->do(function () {
+            // never run
+        });
+    }
+
+    public function testPartialFailureExitsContextsEnteredSoFar(): void
+    {
+        $successful = $this->instrumentedContext();
+        $fails_during_enter = $this->failsOnEnterContext();
+
+        try {
+            with($successful, $fails_during_enter)->do(function () {
+                // never run
+            });
+        } catch (\Exception $e) {
+            // swallow exception
+        }
+
+        $this->assertTrue($successful->exit_did_run);
+    }
+
     private function instrumentedContext()
     {
         return new class implements Context {
@@ -65,6 +93,21 @@ class BasicUseCase extends TestCase
             public function exit()
             {
                 $this->exit_did_run = true;
+            }
+        };
+    }
+
+    private function failsOnEnterContext()
+    {
+        return new class implements Context {
+            public function enter()
+            {
+                throw new \Exception();
+            }
+
+            public function exit()
+            {
+                return null;
             }
         };
     }
