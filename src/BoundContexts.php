@@ -4,6 +4,8 @@ namespace JonathanHunsucker\With;
 
 class BoundContexts
 {
+    private $contexts;
+
     public function __construct(array $contexts)
     {
         $this->contexts = $contexts;
