@@ -30,17 +30,17 @@ with(new Open("file.txt", "w"))->do(function ($handle) {
 - Another layer of indirection
 
 ### Risks
-- Single error handling logic implemented in this library, is mismatch for most domains
+- Single error handling logic implemented in this library, could be a mismatch for some or most domains
 
 
 ## Usage
 ### Multiple contexts
 ```php
 with(
-	new Open("one.txt", "w"),
-	new Open("two.txt", "w")
+    new Open("one.txt", "w"),
+    new Open("two.txt", "w")
 )->do(function ($one, $two) {
-	// todo
+    // todo
 });
 ```
 
