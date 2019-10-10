@@ -21,22 +21,6 @@ class BasicUseCase extends TestCase
         $this->assertEqualsWithDelta(1, $timer->elapsed(), 0.01);
     }
 
-    public function testOpen(): void
-    {
-        touch("test.txt");
-        $file = new Open("test.txt", "w");
-
-        with($file)->do(function ($handle) {
-            // this is awful to manipulate files in concurrently run tests, but it'll do for now
-            fwrite($handle, "hello");
-        });
-
-        $content = file_get_contents("test.txt");
-        unlink("test.txt");
-
-        $this->assertEquals($content, "hello");
-    }
-
     public function testResilienceToExceptions(): void
     {
         $notes_its_own_exit = $this->instrumentedContext();
